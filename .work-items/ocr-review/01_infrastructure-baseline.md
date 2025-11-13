@@ -10,6 +10,7 @@ Spin up a reproducible mono-repo environment with Docker Compose that launches F
 - Kestra UI and API become reachable for defining flows, with persistent storage wired to the mono-repo volumes.
 - Vite client container serves the app at a stable port proxied through the backend.
 - README quickstart snippet documents prerequisites, Makefile targets, service URLs, and commands.
+- `config/` directory contains shared templates (`README.md`, `.env.example`, `kestra/secrets.example.yml`) referenced by Makefile targets.
 
 ## Test Strategy
 
@@ -17,4 +18,5 @@ Spin up a reproducible mono-repo environment with Docker Compose that launches F
 - Run `make backend-build`, `make client-build`, and `make kestra-deploy` (or equivalent) to confirm orchestration delegates to Gradle, PNPM, and Kestra without conflicts.
 - Use `curl` or browser to confirm client, backend, and Kestra health endpoints resolve.
 - Run `docker compose down -v` to ensure volumes/network teardown succeeds.
+- Verify each agent copies `config/.env.example` to local `.env` before executing related Makefile targets.
 
