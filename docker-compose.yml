@@ -1,8 +1,6 @@
-version: "3.9"
-
 services:
   foundationdb:
-    image: foundationdb/foundationdb:7.3.27
+    image: foundationdb/foundationdb:7.3.69
     container_name: ocr-foundationdb
     environment:
       FDB_NETWORKING_MODE: container
@@ -16,12 +14,24 @@ services:
       test:
         [
           "CMD-SHELL",
-          "fdbcli --exec 'status minimal' >/dev/null 2>&1",
+          "fdbcli --exec 'status' >/dev/null 2>&1 || fdbcli --exec 'configure new single memory' >/dev/null 2>&1",
         ]
       interval: 5s
-      timeout: 3s
+      timeout: 5s
       retries: 10
       start_period: 30s
+
+  fdb-init:
+    image: foundationdb/foundationdb:7.3.69
+    container_name: ocr-fdb-init
+    volumes:
+      - ./config/foundationdb/fdb.cluster:/etc/foundationdb/fdb.cluster:ro
+      - ./config/foundationdb/init-db.sh:/init-db.sh:ro
+    entrypoint: ["/bin/bash", "/init-db.sh"]
+    depends_on:
+      foundationdb:
+        condition: service_healthy
+    restart: "no"
 
   backend:
     build:
@@ -66,6 +76,7 @@ services:
   kestra:
     image: kestra/kestra:latest
     container_name: ocr-kestra
+    command: ["server", "standalone"]
     environment:
       KESTRA_CONFIGURATION: /etc/kestra/application.yaml
     volumes:

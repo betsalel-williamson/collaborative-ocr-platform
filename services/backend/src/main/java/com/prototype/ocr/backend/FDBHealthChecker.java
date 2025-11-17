@@ -50,8 +50,15 @@ final class FDBHealthChecker implements AutoCloseable {
         try {
             probeSupplier.check();
             healthy.set(true);
-        } catch (Exception | UnsatisfiedLinkError ex) {
+            System.out.println("[FDB Health] Check passed");
+        } catch (Throwable ex) {
             healthy.set(false);
+            // Log failure for debugging - use both stdout and stderr
+            String errorMsg = "[FDB Health] Check failed: " + ex.getClass().getSimpleName() + ": " + (ex.getMessage() != null ? ex.getMessage() : ex.toString());
+            System.out.println(errorMsg);
+            System.err.println(errorMsg);
+            ex.printStackTrace(System.out);
+            ex.printStackTrace();
         }
     }
 

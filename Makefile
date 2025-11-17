@@ -8,9 +8,11 @@ ifeq ($(wildcard $(ENV_FILE)),)
 $(error Missing $(ENV_FILE). Copy config/.env.example to $(ENV_FILE) and customize variables.)
 endif
 
+# Export environment variables from .env file for docker-compose
 export $(shell sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/\1/p' $(ENV_FILE))
 
-COMPOSE = docker compose --env-file $(ENV_FILE)
+# Use docker-compose (standalone) - it automatically loads .env from current directory
+COMPOSE = docker-compose
 PWD_ABS := $(shell pwd)
 
 infra-up:
