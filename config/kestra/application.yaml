@@ -1,0 +1,27 @@
+datasources:
+  main:
+    url: jdbc:h2:/app/storage/kestra-h2
+    driverClassName: org.h2.Driver
+    username: kestra
+    password: kestra
+
+kestra:
+  repository:
+    type: jdbc
+  queue:
+    type: memory
+  scheduler:
+    type: memory
+  storage:
+    type: local
+    local:
+      basePath: /app/storage
+  indexing:
+    type: local
+  loggers:
+    type: jdbc
+  flows:
+    type: local
+    local:
+      basePath: /app/flows
+

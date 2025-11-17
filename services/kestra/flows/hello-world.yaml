@@ -1,0 +1,8 @@
+---
+id: hello_world
+namespace: ocr.review
+description: Simple Kestra flow placeholder for OCR ingestion orchestration.
+tasks:
+  - id: log_start
+    type: io.kestra.plugin.core.debug.Log
+    message: "Hello from Kestra flow scaffold"

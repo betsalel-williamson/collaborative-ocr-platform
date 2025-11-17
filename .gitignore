@@ -1,0 +1,15 @@
+# Node / web artifacts
+node_modules/
+dist/
+
+# Java / Gradle artifacts
+.gradle/
+build/
+
+# Environment overrides
+.env
+.env.local
+
+# macOS metadata
+.DS_Store
+

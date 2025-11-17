@@ -26,12 +26,12 @@ Work-in-progress mono-repo for a collaborative OCR review MVP leveraging Foundat
 
 ## Makefile Orchestration
 
-`Makefile` in the repo root provides placeholder targets for building and testing the backend, client, and Kestra flows, plus infrastructure helpers. Replace the `echo` stubs with actual Gradle/PNPM/Kestra commands when scaffolding each service.
+`Makefile` in the repo root orchestrates container builds and local automation via Docker toolchains. Copy `config/.env.example` to `.env` first so shared environment variables are available to Make and Compose.
 
-- `make infra-up` / `make infra-down`
-- `make backend-build`, `make backend-test`
-- `make client-build`, `make client-test`
-- `make kestra-deploy`, `make kestra-test`
+- `make infra-up` / `make infra-down` — start/stop the full Docker Compose stack.
+- `make backend-build`, `make backend-test` — run Gradle build/test inside the official `gradle:8.7-jdk17` container.
+- `make client-build`, `make client-test` — install dependencies and run Vite/Vitest via `pnpm` in `node:20-alpine`.
+- `make kestra-deploy`, `make kestra-test` — validate and inspect Kestra flows using the `kestra/kestra:4.1.0` CLI.
 
 ## Configuration Conventions
 
@@ -45,4 +45,17 @@ Work-in-progress mono-repo for a collaborative OCR review MVP leveraging Foundat
 - FoundationDB Record Layer Getting Started — [https://foundationdb.github.io/fdb-record-layer/GettingStarted.html](https://foundationdb.github.io/fdb-record-layer/GettingStarted.html)
 - FoundationDB Blob Storage Pattern — [https://apple.github.io/foundationdb/blob.html](https://apple.github.io/foundationdb/blob.html)
 - PWA Caching Guide — [https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Caching](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Caching)
+
+## Quickstart
+
+1. Copy shared env vars: `cp config/.env.example .env`.
+2. Bring up the stack: `make infra-up` (equivalent to `docker compose up --build`).
+3. Visit services:
+   - Backend API / health check — `http://localhost:8080/healthz`
+   - Vite preview (proxied via backend) — `http://localhost:8080/`
+   - FoundationDB admin (CLI only) — `docker exec -it ocr-foundationdb fdbcli`
+   - Kestra UI — `http://localhost:8081/`
+4. Tear everything down: `make infra-down`.
+
+Service-specific targets remain available for isolated development (`make backend-test`, `make client-build`, etc.).
 

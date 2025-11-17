@@ -1,0 +1,85 @@
+version: "3.9"
+
+services:
+  foundationdb:
+    image: foundationdb/foundationdb:7.3.27
+    container_name: ocr-foundationdb
+    environment:
+      FDB_NETWORKING_MODE: container
+      FDB_COORDINATOR_DESCRIPTION: docker:docker@foundationdb:4500
+    volumes:
+      - fdb-data:/var/lib/foundationdb/data
+      - ./config/foundationdb/fdb.cluster:/etc/foundationdb/fdb.cluster:ro
+    ports:
+      - "${FDB_EXTERNAL_PORT:-4500}:4500"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "fdbcli --exec 'status minimal' >/dev/null 2>&1",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
+  backend:
+    build:
+      context: ./services/backend
+      target: runtime
+    depends_on:
+      foundationdb:
+        condition: service_healthy
+      client:
+        condition: service_started
+    environment:
+      BACKEND_PORT: ${BACKEND_PORT:-8080}
+      FDB_CLUSTER_FILE: /app/config/fdb.cluster
+      CLIENT_BASE_URL: http://client:${CLIENT_PORT:-4173}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    volumes:
+      - ./config/foundationdb/fdb.cluster:/app/config/fdb.cluster:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fsS http://localhost:8080/healthz >/dev/null",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+
+  client:
+    build:
+      context: ./services/client
+      target: runtime
+    environment:
+      CLIENT_PORT: ${CLIENT_PORT:-4173}
+    command:
+      - /bin/sh
+      - -c
+      - pnpm preview --host 0.0.0.0 --port "${CLIENT_PORT:-4173}"
+    ports:
+      - "${CLIENT_PORT:-4173}:4173"
+
+  kestra:
+    image: kestra/kestra:latest
+    container_name: ocr-kestra
+    environment:
+      KESTRA_CONFIGURATION: /etc/kestra/application.yaml
+    volumes:
+      - kestra-data:/app/storage
+      - ./services/kestra/flows:/app/flows
+      - ./config/kestra/application.yaml:/etc/kestra/application.yaml:ro
+      - ./config/kestra/secrets.example.yml:/etc/kestra/secrets.yml:ro
+    ports:
+      - "${KESTRA_UI_PORT:-8081}:8080"
+    depends_on:
+      foundationdb:
+        condition: service_healthy
+
+volumes:
+  fdb-data:
+  kestra-data:
+
