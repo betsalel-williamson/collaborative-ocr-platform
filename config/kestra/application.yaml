@@ -1,7 +1,25 @@
+# ============================================================================
+# SECURITY WARNING: DUMMY CREDENTIALS - LOCAL DEVELOPMENT ONLY
+# ============================================================================
+# This file contains DUMMY credentials for LOCAL DEVELOPMENT ONLY.
+#
+# ❌ DO NOT use these credentials in:
+#    - Staging environments
+#    - Production environments
+#    - Any non-locally hosted environments (cloud, remote servers, etc.)
+#
+# ✅ ONLY use these credentials for:
+#    - Local development on your personal machine
+#
+# For staging/production/non-local environments, use environment variables
+# or a secrets management system (e.g., HashiCorp Vault, AWS Secrets Manager).
+# ============================================================================
+
 datasources:
   main:
     url: jdbc:h2:/app/storage/kestra-h2
     driverClassName: org.h2.Driver
+    # DUMMY CREDENTIALS - Replace in production
     username: kestra
     password: kestra
 

@@ -71,6 +71,9 @@ services:
     volumes:
       - kestra-data:/app/storage
       - ./services/kestra/flows:/app/flows
+      # WARNING: Using example secrets file for LOCAL DEVELOPMENT ONLY
+      # ❌ DO NOT use in staging, production, or any non-locally hosted environments
+      # For staging/production, mount a real secrets.yml file from secure storage instead
       - ./config/kestra/application.yaml:/etc/kestra/application.yaml:ro
       - ./config/kestra/secrets.example.yml:/etc/kestra/secrets.yml:ro
     ports:
