@@ -20,3 +20,26 @@ Spin up a reproducible mono-repo environment with Docker Compose that launches F
 - Run `docker compose down -v` to ensure volumes/network teardown succeeds.
 - Verify each agent copies `config/.env.example` to local `.env` before executing related Makefile targets.
 
+## Implementation Notes
+
+- Added `docker-compose.yml` covering FoundationDB, backend runtime, Vite client preview, and Kestra with shared volumes and health checks.
+- Scaffolded backend Gradle app exposing `/healthz`, proxying the client, and probing FoundationDB readiness with periodic checks.
+- Created Vite React client with PNPM + Vitest setup plus Dockerfile for preview mode.
+- Populated `config/` templates (`.env.example`, cluster file, Kestra configs) and refined `config/README.md`.
+- Replaced root `Makefile` stubs with Docker-based commands that enforce `.env` presence, delegate builds/tests, and validate Kestra flows.
+- Documented quickstart flow in `README.md` and added repo-level `.gitignore`.
+
+## Test Evidence
+
+- ✅ `make backend-test`: PASSED - Backend Gradle tests compile and run successfully using `org.foundationdb:fdb-java:7.3.27` dependency (package name is `com.apple.foundationdb`).
+- ✅ `make client-test`: PASSED - Client Vitest tests run successfully after adding `jsdom` dependency for DOM environment.
+- ✅ `make kestra-deploy`: PASSED - Kestra flow YAML validation passes. Full flow validation requires running Kestra server (tested via docker-compose).
+- ⏳ `make infra-up`/`infra-down`: READY - Full stack integration can be tested with `make infra-up`. All services configured and ready.
+
+**Infrastructure Status:**
+- Docker Compose configuration complete with all services (FoundationDB, backend, client, Kestra)
+- Makefile targets delegate correctly to Gradle/PNPM/Kestra
+- Backend and client services build and test successfully
+- FoundationDB Java client dependency resolved and working
+- Configuration templates in place (`config/.env.example`, `config/kestra/`, `config/foundationdb/`)
+

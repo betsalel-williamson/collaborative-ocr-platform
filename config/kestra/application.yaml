@@ -1,0 +1,59 @@
+# ============================================================================
+# SECURITY WARNING: DUMMY CREDENTIALS - LOCAL DEVELOPMENT ONLY
+# ============================================================================
+# This file contains DUMMY credentials for LOCAL DEVELOPMENT ONLY.
+#
+# ❌ DO NOT use these credentials in:
+#    - Staging environments
+#    - Production environments
+#    - Any non-locally hosted environments (cloud, remote servers, etc.)
+#
+# ✅ ONLY use these credentials for:
+#    - Local development on your personal machine
+#
+# For staging/production/non-local environments, use environment variables
+# or a secrets management system (e.g., HashiCorp Vault, AWS Secrets Manager).
+# ============================================================================
+
+datasources:
+  h2:
+    url: jdbc:h2:/app/storage/kestra-h2;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+
+kestra:
+  repository:
+    type: h2
+  queue:
+    type: h2
+  scheduler:
+    type: memory
+  storage:
+    type: local
+    local:
+      basePath: /app/storage
+  indexing:
+    type: local
+  loggers:
+    type: h2
+  flows:
+    type: local
+    local:
+      basePath: /app/flows
+  # Use Process Task Runner for single-container mode (no Docker socket required)
+  plugins:
+    defaults:
+      - type: io.kestra.plugin.scripts.python.Commands
+        values:
+          taskRunner:
+            type: io.kestra.plugin.core.runner.Process
+      - type: io.kestra.plugin.scripts.shell.Commands
+        values:
+          taskRunner:
+            type: io.kestra.plugin.core.runner.Process
+      - type: io.kestra.plugin.scripts.node.Commands
+        values:
+          taskRunner:
+            type: io.kestra.plugin.core.runner.Process
+

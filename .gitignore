@@ -1,0 +1,27 @@
+# Node / web artifacts
+node_modules/
+.pnpm-store/
+**/.pnpm-store/
+dist/
+
+# Java / Gradle artifacts
+.gradle/
+build/
+
+# Environment overrides and secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+# Secret files - NEVER commit these
+**/secrets.yml
+**/secrets.yaml
+**/*secret*.yml
+**/*secret*.yaml
+config/kestra/secrets.yml
+config/**/secrets.yml
+
+# macOS metadata
+.DS_Store
+
