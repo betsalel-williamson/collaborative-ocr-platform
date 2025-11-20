@@ -8,20 +8,23 @@ RUN gradle --no-daemon clean installDist
 
 FROM eclipse-temurin:17-jre-jammy AS runtime
 
+# Set noninteractive mode for all apt operations
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Install FoundationDB client library
 # For amd64: use DEB package directly
 # For aarch64: convert RPM to DEB using alien
-RUN DEBIAN_FRONTEND=noninteractive apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends curl wget ca-certificates \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl wget ca-certificates \
     && ARCH=$(dpkg --print-architecture) \
     && if [ "$ARCH" = "amd64" ]; then \
         wget -O /tmp/foundationdb-clients.deb https://github.com/apple/foundationdb/releases/download/7.3.69/foundationdb-clients_7.3.69-1_amd64.deb \
-        && DEBIAN_FRONTEND=noninteractive dpkg -i /tmp/foundationdb-clients.deb || DEBIAN_FRONTEND=noninteractive apt-get install -y -f; \
+        && dpkg -i /tmp/foundationdb-clients.deb || apt-get install -y -f; \
     elif [ "$ARCH" = "arm64" ]; then \
-        DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends alien \
+        apt-get install -y --no-install-recommends alien \
         && wget -O /tmp/foundationdb-clients.rpm https://github.com/apple/foundationdb/releases/download/7.3.69/foundationdb-clients-7.3.69-1.el9.aarch64.rpm \
         && cd /tmp && alien -d foundationdb-clients.rpm \
-        && DEBIAN_FRONTEND=noninteractive dpkg -i /tmp/foundationdb-clients*.deb || DEBIAN_FRONTEND=noninteractive apt-get install -y -f; \
+        && dpkg -i /tmp/foundationdb-clients*.deb || apt-get install -y -f; \
     else \
         echo "Unsupported architecture: $ARCH" && exit 1; \
     fi \
